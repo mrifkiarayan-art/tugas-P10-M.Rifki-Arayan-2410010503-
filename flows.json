@@ -1,0 +1,257 @@
+[
+    {
+        "id": "tab_tugas",
+        "type": "tab",
+        "label": "Tugas Mini - Relay dan PWM",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "tugas_in_suhu",
+        "type": "mqtt in",
+        "z": "tab_tugas",
+        "name": "Suhu dari perangkat",
+        "topic": "iot/2410010503/sensor/suhu",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "broker_tugas",
+        "inputs": 0,
+        "x": 190,
+        "y": 80,
+        "wires": [
+            [
+                "tugas_fn_suhu"
+            ]
+        ]
+    },
+    {
+        "id": "tugas_fn_suhu",
+        "type": "function",
+        "z": "tab_tugas",
+        "name": "Parse Float",
+        "func": "msg.payload = parseFloat(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "x": 410,
+        "y": 80,
+        "wires": [
+            [
+                "tugas_gauge"
+            ]
+        ]
+    },
+    {
+        "id": "tugas_gauge",
+        "type": "ui_gauge",
+        "z": "tab_tugas",
+        "name": "Suhu",
+        "group": "tugas_grp_monitor",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Suhu (°C)",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 0,
+        "max": 50,
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 610,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "tugas_switch_relay",
+        "type": "ui_switch",
+        "z": "tab_tugas",
+        "name": "Kontrol Relay",
+        "label": "Relay (GPIO 26)",
+        "tooltip": "Klik untuk ON/OFF",
+        "group": "tugas_grp_kontrol",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "passthru": false,
+        "decouple": "false",
+        "topic": "iot/2410010503/aktuator/relay",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "ON",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "OFF",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 190,
+        "y": 180,
+        "wires": [
+            [
+                "tugas_out"
+            ]
+        ]
+    },
+    {
+        "id": "tugas_slider_pwm",
+        "type": "ui_slider",
+        "z": "tab_tugas",
+        "name": "Slider PWM",
+        "label": "PWM LED (GPIO 2)",
+        "tooltip": "Atur kecerahan 0-255",
+        "group": "tugas_grp_kontrol",
+        "order": 2,
+        "width": "6",
+        "height": "1",
+        "passthru": false,
+        "outs": "end",
+        "topic": "iot/2410010503/aktuator/pwm",
+        "topicType": "str",
+        "min": 0,
+        "max": 255,
+        "step": 1,
+        "x": 190,
+        "y": 260,
+        "wires": [
+            [
+                "tugas_out"
+            ]
+        ]
+    },
+    {
+        "id": "tugas_out",
+        "type": "mqtt out",
+        "z": "tab_tugas",
+        "name": "Kirim perintah",
+        "topic": "",
+        "qos": "0",
+        "retain": "false",
+        "broker": "broker_tugas",
+        "x": 430,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "tugas_in_status_relay",
+        "type": "mqtt in",
+        "z": "tab_tugas",
+        "name": "Status relay",
+        "topic": "iot/2410010503/status/relay",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "broker_tugas",
+        "inputs": 0,
+        "x": 170,
+        "y": 340,
+        "wires": [
+            [
+                "tugas_text_relay"
+            ]
+        ]
+    },
+    {
+        "id": "tugas_text_relay",
+        "type": "ui_text",
+        "z": "tab_tugas",
+        "group": "tugas_grp_kontrol",
+        "order": 3,
+        "width": "6",
+        "height": "1",
+        "name": "Status Relay",
+        "label": "Status Relay",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 400,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "tugas_in_status_pwm",
+        "type": "mqtt in",
+        "z": "tab_tugas",
+        "name": "Status PWM",
+        "topic": "iot/2410010503/status/pwm",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "broker_tugas",
+        "inputs": 0,
+        "x": 170,
+        "y": 400,
+        "wires": [
+            [
+                "tugas_text_pwm"
+            ]
+        ]
+    },
+    {
+        "id": "tugas_text_pwm",
+        "type": "ui_text",
+        "z": "tab_tugas",
+        "group": "tugas_grp_kontrol",
+        "order": 4,
+        "width": "6",
+        "height": "1",
+        "name": "Status PWM",
+        "label": "Nilai PWM",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 400,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "broker_tugas",
+        "type": "mqtt-broker",
+        "name": "Mosquitto Lokal",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "NodeRED-Tugas-2410010503",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "tugas_grp_monitor",
+        "type": "ui_group",
+        "name": "Monitoring",
+        "tab": "tugas_ui_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "tugas_grp_kontrol",
+        "type": "ui_group",
+        "name": "Kontrol",
+        "tab": "tugas_ui_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "tugas_ui_tab",
+        "type": "ui_tab",
+        "name": "Tugas IoT",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "a655c1d6d7c6a461",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
